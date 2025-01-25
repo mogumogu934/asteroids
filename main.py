@@ -1,4 +1,5 @@
 import pygame
+import sys
 from constants import *
 from circleshape import CircleShape
 from player import Player
@@ -29,6 +30,11 @@ def main():
     player = Player(x, y, shots)
     asteroid_field = AsteroidField()
     
+    # score tracker
+    font = pygame.font.SysFont(None, 36)
+    score = 0
+    
+    
     # game loop
     while True:
         for event in pygame.event.get():
@@ -43,6 +49,7 @@ def main():
         for asteroid in asteroids:
             if player.has_collided(asteroid):
                 print("Game over!")
+                print(f"Score: {score}")
                 exit()
                 
         for asteroid in asteroids:
@@ -50,8 +57,11 @@ def main():
                 if shot.has_collided(asteroid):
                     shot.kill()
                     asteroid.split()
+                    score += 100
             
         pygame.Surface.fill(screen, (0, 0, 0))
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (10, 10))
         
         for object in drawable:
             object.draw(screen)
