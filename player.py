@@ -48,6 +48,10 @@ class Player(CircleShape):
             self.shoot()   
         
     def shoot(self):
+        pygame.mixer.init()
+        shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
+        shot_sound.set_volume(0.5)
+        
         if self.shot_cooldown > 0:
             return
         
@@ -55,4 +59,5 @@ class Player(CircleShape):
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
         self.shots.add(shot)
+        shot_sound.play()
         
