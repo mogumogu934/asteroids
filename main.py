@@ -53,7 +53,7 @@ def main():
     score = 0
     high_score = get_high_score()
     
-    # game loop
+    # Game loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -76,13 +76,17 @@ def main():
                 exit()
                 
         for asteroid in asteroids:
+            if asteroid.is_off_screen():
+                asteroid.kill()
             for shot in shots:
+                if shot.is_off_screen():
+                    shot.kill()
                 if shot.has_collided(asteroid):
                     shot.kill()
                     asteroid.split()
                     random.choice(asteroid_kill_sounds).play()
-                    score += 100   
-            
+                    score += 100
+                    
         pygame.Surface.fill(screen, (0, 0, 0))
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
