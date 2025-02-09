@@ -59,7 +59,7 @@ def main():
             if event.type == pygame.QUIT:
                 return
             
-        dt = clock.tick(60) / 1000
+        dt = clock.tick(120) / 1000
         
         for object in updatable:
             object.update(dt)
