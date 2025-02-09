@@ -1,14 +1,17 @@
 import pygame
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
+from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
 from circleshape import CircleShape
 from shot import Shot
 
 class Player(CircleShape):
     def __init__(self, x, y, shots):
         super().__init__(x, y, PLAYER_RADIUS)
+        self.velocity = pygame.Vector2(0, 0)
         self.rotation = 0
         self.shots = shots
         self.shot_cooldown = 0
+        self.shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
+        self.shot_sound.set_volume(0.5)
         
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -21,9 +24,12 @@ class Player(CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(screen, (255, 255, 255), self.triangle(), 2)
     
-    def move(self, dt, direction):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt * direction
+    def move(self, dt, forward=True):
+        forward_vector = pygame.Vector2(0, 1).rotate(self.rotation)
+        if forward:
+            self.velocity += forward_vector * PLAYER_ACCELERATION * dt
+        else:
+            self.velocity -= forward_vector * PLAYER_ACCELERATION * dt
         
     def rotate(self, dt, direction):
         self.rotation += PLAYER_TURN_SPEED * dt * direction
@@ -33,10 +39,10 @@ class Player(CircleShape):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w] or keys[pygame.K_UP]:
-            self.move(dt, 1)
+            self.move(dt,forward=True)
             
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            self.move(dt, -1)
+            self.move(dt, forward=False)
 
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.rotate(dt, -1)
@@ -45,13 +51,16 @@ class Player(CircleShape):
             self.rotate(dt, 1)
             
         if keys[pygame.K_SPACE]:
-            self.shoot()   
+            self.shoot()
+            
+        self.position += self.velocity * dt
+        self.velocity *= PLAYER_FRICTION
+        if self.velocity.length() < 0.1:
+            self.velocity = pygame.Vector2(0,0)
+        if self.velocity.length() > PLAYER_MAX_SPEED:
+            self.velocity = self.velocity.normalize() * PLAYER_MAX_SPEED
         
     def shoot(self):
-        pygame.mixer.init()
-        shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
-        shot_sound.set_volume(0.5)
-        
         if self.shot_cooldown > 0:
             return
         
@@ -59,5 +68,5 @@ class Player(CircleShape):
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
         self.shots.add(shot)
-        shot_sound.play()
+        self.shot_sound.play()
         
