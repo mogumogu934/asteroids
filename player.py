@@ -1,5 +1,5 @@
-import pygame
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
+import pygame # type: ignore
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
 from circleshape import CircleShape
 from shot import Shot
 
@@ -12,6 +12,8 @@ class Player(CircleShape):
         self.shot_cooldown = 0
         self.shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
         self.shot_sound.set_volume(0.5)
+        self.lives = 1
+        self.invincible = False
         
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -22,6 +24,10 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
+        if self.invincible:
+            current_time = pygame.time.get_ticks()
+            if current_time % 200 < 100: # Player will flicker every 100 ms
+                return
         pygame.draw.polygon(screen, (255, 255, 255), self.triangle(), 2)
     
     def move(self, dt, forward=True):
@@ -69,4 +75,10 @@ class Player(CircleShape):
         shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
         self.shots.add(shot)
         self.shot_sound.play()
+        
+    def respawn(self):
+        self.position = pygame.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        self.invincible = True
+        self.velocity = pygame.Vector2(0, 0)
+        pygame.time.set_timer(pygame.USEREVENT + 1, 3000)
         

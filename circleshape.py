@@ -30,3 +30,4 @@ class CircleShape(pygame.sprite.Sprite):
                 self.position.x - self.radius > SCREEN_WIDTH * 2 or
                 self.position.y + self.radius < SCREEN_HEIGHT * -1 or
                 self.position.y - self.radius > SCREEN_HEIGHT * 2 )
+        

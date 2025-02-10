@@ -1,5 +1,4 @@
-import pygame
-import sys
+import pygame # type: ignore
 import random
 from constants import *
 from circleshape import CircleShape
@@ -28,8 +27,6 @@ def main():
     
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     print("Starting asteroids!")
-    print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
 
     clock = pygame.time.Clock()
     dt = 0
@@ -56,6 +53,9 @@ def main():
     # Game loop
     while True:
         for event in pygame.event.get():
+            if event.type == pygame.USEREVENT + 1:
+                player.invincible = False
+                pygame.time.set_timer(pygame.USEREVENT + 1, 0)
             if event.type == pygame.QUIT:
                 return
             
@@ -63,24 +63,30 @@ def main():
         
         for object in updatable:
             object.update(dt)
-            
-        for asteroid in asteroids:
-            if player.has_collided(asteroid):
-                death_sound.play()
-                print("Game over!")
-                if score > high_score:
-                    save_high_score(score)
-                    print(f"New high score of {score} pts!")
-                else:
-                    print(f"Score: {score}")
-                exit()
-                
+        
         for asteroid in asteroids:
             if asteroid.is_off_screen():
                 asteroid.kill()
+                continue
+            if player.has_collided(asteroid) and not player.invincible:
+                death_sound.play()
+                if player.lives > 0:
+                    player.lives -= 1
+                    player.respawn()
+                else:
+                    print("Game over!")
+                    if score > high_score:
+                        save_high_score(score)
+                        print(f"New high score of {score} pts!")
+                    else:
+                        print(f"Score: {score}")
+                    exit()
+                
+        for asteroid in asteroids:
             for shot in shots:
                 if shot.is_off_screen():
                     shot.kill()
+                    continue
                 if shot.has_collided(asteroid):
                     shot.kill()
                     asteroid.split()
@@ -89,7 +95,9 @@ def main():
                     
         pygame.Surface.fill(screen, (0, 0, 0))
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-        screen.blit(score_text, (10, 10))
+        screen.blit(score_text, (16, 16))
+        lives_text = font.render(f"Lives Remaining: {player.lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (16, 48))
         
         for object in drawable:
             object.draw(screen)
