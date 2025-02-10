@@ -11,26 +11,21 @@ def main():
     pygame.init()
     pygame.mixer.init()
     
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background = pygame.image.load("./images/bg.png").convert()
+    print("Starting asteroids!")
+    
+    bgm = pygame.mixer.Sound("./sounds/Startide.wav")
+    bgm.play(-1)
     start_sound = pygame.mixer.Sound("./sounds/jingle01.wav")
-    start_sound.set_volume(0.5)
+    start_sound.play()
     asteroid_kill_sounds = [
         pygame.mixer.Sound("./sounds/asteroidkill01.wav"),
         pygame.mixer.Sound("./sounds/asteroidkill02.wav"),
         pygame.mixer.Sound("./sounds/asteroidkill03.wav"),
     ]
-    asteroid_kill_sounds[0].set_volume(0.25)
-    asteroid_kill_sounds[1].set_volume(0.25)
-    asteroid_kill_sounds[2].set_volume(0.25)
     death_sound = pygame.mixer.Sound("./sounds/death01.wav")
-    death_sound.set_volume(0.5)
-    
-    
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    print("Starting asteroids!")
 
-    clock = pygame.time.Clock()
-    dt = 0
-    
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
@@ -45,10 +40,13 @@ def main():
     player = Player(x, y, shots)
     asteroid_field = AsteroidField()
     
-    start_sound.play()
     font = pygame.font.SysFont(None, 36)
     score = 0
+    next_life_threshold = 10000
     high_score = get_high_score()
+    
+    clock = pygame.time.Clock()
+    dt = 0
     
     # Game loop
     while True:
@@ -94,8 +92,11 @@ def main():
                     asteroid.split()
                     random.choice(asteroid_kill_sounds).play()
                     score += 100
+                    if score >= next_life_threshold:
+                        player.lives += 1
+                        next_life_threshold += 10000
                     
-        pygame.Surface.fill(screen, (0, 0, 0))
+        screen.blit(background, [0, 0])
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         screen.blit(score_text, (16, 16))
         lives_text = font.render(f"Lives Remaining: {player.lives}", True, (255, 255, 255))
