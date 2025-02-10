@@ -1,5 +1,5 @@
 import pygame # type: ignore
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WRAP_AROUND, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WRAP_AROUND, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOT_SPEED, PLAYER_SHOT_COOLDOWN, POWERUP_DURATION
 from circleshape import CircleShape
 from shot import Shot
 
@@ -11,9 +11,11 @@ class Player(CircleShape):
         self.shots = shots
         self.shot_cooldown = 0
         self.shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
-        self.shot_sound.set_volume(0.5)
         self.lives = 1
         self.invincible = False
+        self.powerup_timer = 0
+        self.active_powerup = None
+        self.base_shot_cooldown = PLAYER_SHOT_COOLDOWN
         
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -67,14 +69,27 @@ class Player(CircleShape):
             self.velocity = self.velocity.normalize() * PLAYER_MAX_SPEED
         if WRAP_AROUND:
             self.wrap_around(SCREEN_WIDTH, SCREEN_HEIGHT)
+            
+        if self.active_powerup:
+            self.powerup_timer += dt
+            if self.powerup_timer >= POWERUP_DURATION:
+                if self.active_powerup == "SHIELD":
+                    self.invincible = False
+                elif self.active_powerup == "DECREASED SHOT COOLDOWN":
+                    self.shot_cooldown = self.base_shot_cooldown
+                self.active_powerup = None
+                self.powerup_timer = 0
         
     def shoot(self):
         if self.shot_cooldown > 0:
             return
         
-        self.shot_cooldown = PLAYER_SHOOT_COOLDOWN
+        cooldown = self.base_shot_cooldown
+        if self.active_powerup == "DECREASED SHOT COOLDOWN":
+            cooldown *= 0.5
+        self.shot_cooldown = cooldown
         shot = Shot(self.position.x, self.position.y)
-        shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+        shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOT_SPEED
         self.shots.add(shot)
         self.shot_sound.play()
         

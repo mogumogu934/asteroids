@@ -5,10 +5,12 @@ from circleshape import CircleShape
 from player import Player
 from asteroidfield import *
 from shot import Shot
+from powerup import *
 from high_score import get_high_score, save_high_score
 
 def main():
     pygame.init()
+    pygame.mixer.pre_init(44100, -16, 2, 8192)
     pygame.mixer.init()
     
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -17,28 +19,31 @@ def main():
     
     bgm = pygame.mixer.Sound("./sounds/Startide.wav")
     bgm.play(-1)
-    start_sound = pygame.mixer.Sound("./sounds/jingle01.wav")
-    start_sound.play()
     asteroid_kill_sounds = [
         pygame.mixer.Sound("./sounds/asteroidkill01.wav"),
         pygame.mixer.Sound("./sounds/asteroidkill02.wav"),
         pygame.mixer.Sound("./sounds/asteroidkill03.wav"),
     ]
     death_sound = pygame.mixer.Sound("./sounds/death01.wav")
+    next_life_sound = pygame.mixer.Sound("./sounds/jingle03.wav")
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
-    Player.containers = (updatable, drawable)
-    Asteroid.containers = (asteroids, updatable, drawable)
+    powerups = pygame.sprite.Group()
+    Player.containers = (updatable, drawable,)
+    Asteroid.containers = (asteroids, updatable, drawable,)
     AsteroidField.containers = (updatable,)
-    Shot.containers = (updatable, drawable)
+    Shot.containers = (updatable, drawable,)
+    PowerUp.containers = (updatable, drawable, powerups,)
+    PowerUpField.containers = (updatable,)
     
     x = SCREEN_WIDTH / 2
     y = SCREEN_HEIGHT / 2
     player = Player(x, y, shots)
     asteroid_field = AsteroidField()
+    powerup_field = PowerUpField()
     
     font = pygame.font.SysFont(None, 36)
     score = 0
@@ -95,6 +100,17 @@ def main():
                     if score >= next_life_threshold:
                         player.lives += 1
                         next_life_threshold += 10000
+                        next_life_sound.play()
+                         
+        for powerup in powerups:
+            if powerup.has_collided(player):
+                player.active_powerup = powerup.effect
+                player.powerup_timer = 0
+                if powerup.effect == "SHIELD":
+                    player.invincible = True
+                elif powerup.effect == "DECREASED SHOT COOLDOWN":
+                    player.shot_cooldown *= 0.05
+                powerup.kill()
                     
         screen.blit(background, [0, 0])
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
