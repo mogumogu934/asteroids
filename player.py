@@ -1,5 +1,5 @@
 import pygame # type: ignore
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WRAP_AROUND, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN
 from circleshape import CircleShape
 from shot import Shot
 
@@ -65,6 +65,8 @@ class Player(CircleShape):
             self.velocity = pygame.Vector2(0,0)
         if self.velocity.length() > PLAYER_MAX_SPEED:
             self.velocity = self.velocity.normalize() * PLAYER_MAX_SPEED
+        if WRAP_AROUND:
+            self.wrap_around(SCREEN_WIDTH, SCREEN_HEIGHT)
         
     def shoot(self):
         if self.shot_cooldown > 0:

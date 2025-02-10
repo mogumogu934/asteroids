@@ -65,9 +65,10 @@ def main():
             object.update(dt)
         
         for asteroid in asteroids:
-            if asteroid.is_off_screen():
-                asteroid.kill()
-                continue
+            if not WRAP_AROUND:
+                if asteroid.is_off_screen():
+                    asteroid.kill()
+                    continue
             if player.has_collided(asteroid) and not player.invincible:
                 death_sound.play()
                 if player.lives > 0:
@@ -84,9 +85,10 @@ def main():
                 
         for asteroid in asteroids:
             for shot in shots:
-                if shot.is_off_screen():
-                    shot.kill()
-                    continue
+                if not WRAP_AROUND:
+                    if shot.is_off_screen():
+                        shot.kill()
+                        continue
                 if shot.has_collided(asteroid):
                     shot.kill()
                     asteroid.split()
