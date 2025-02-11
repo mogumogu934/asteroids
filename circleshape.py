@@ -31,7 +31,7 @@ class CircleShape(pygame.sprite.Sprite):
                 self.position.y + self.radius < SCREEN_HEIGHT * -0.5 or
                 self.position.y - self.radius > SCREEN_HEIGHT * 1.5)
 
-    def wrap_around(self, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def wrap_around(self):
         if self.position.x - self.radius > SCREEN_WIDTH:
             self.position.x = -self.radius
         elif self.position.x + self.radius < 0:

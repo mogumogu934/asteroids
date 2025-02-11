@@ -1,5 +1,5 @@
 import pygame # type: ignore
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WRAP_AROUND, SHOT_RADIUS, SHOT_LIFETIME
+from constants import WRAP_AROUND, SHOT_RADIUS, SHOT_LIFETIME
 from circleshape import CircleShape
 
 class Shot(CircleShape):
@@ -17,5 +17,5 @@ class Shot(CircleShape):
             
         self.position += self.velocity * dt
         if WRAP_AROUND:
-            self.wrap_around(SCREEN_WIDTH, SCREEN_HEIGHT)
+            self.wrap_around()
         

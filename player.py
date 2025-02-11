@@ -74,7 +74,7 @@ class Player(CircleShape):
         if self.velocity.length() > self.max_speed:
             self.velocity = self.velocity.normalize() * self.max_speed
         if WRAP_AROUND:
-            self.wrap_around(SCREEN_WIDTH, SCREEN_HEIGHT)
+            self.wrap_around()
             
         if self.active_powerup:
             self.powerup_timer += dt
