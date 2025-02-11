@@ -13,6 +13,7 @@ class Player(CircleShape):
         self.shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
         self.is_charging_shot = False
         self.lives = 1
+        self.spawn_invincible = False
         self.invincible = False
         self.powerup_timer = 0
         self.active_powerup = None
@@ -32,7 +33,7 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
-        if self.invincible:
+        if self.spawn_invincible or self.invincible:
             current_time = pygame.time.get_ticks()
             if current_time % 200 < 100: # Player will flicker every 100 ms
                 return
@@ -106,7 +107,7 @@ class Player(CircleShape):
         
     def respawn(self):
         self.position = pygame.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        self.invincible = True
+        self.spawn_invincible = True
         self.velocity = pygame.Vector2(0, 0)
         pygame.time.set_timer(pygame.USEREVENT + 1, 3000)
         

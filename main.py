@@ -57,7 +57,7 @@ def main():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.USEREVENT + 1:
-                player.invincible = False
+                player.spawn_invincible = False
                 pygame.time.set_timer(pygame.USEREVENT + 1, 0)
             if event.type == pygame.QUIT:
                 return
@@ -72,7 +72,7 @@ def main():
                 if asteroid.is_off_screen():
                     asteroid.kill()
                     continue
-            if player.has_collided(asteroid) and not player.invincible:
+            if player.has_collided(asteroid) and not player.spawn_invincible and not player.invincible:
                 death_sound.play()
                 if player.lives > 0:
                     player.lives -= 1
