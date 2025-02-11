@@ -41,9 +41,7 @@ def main():
     PowerUpField.containers = (updatable,)
     
     # Spawn player and other entities
-    center_x = SCREEN_WIDTH // 2
-    center_y = SCREEN_HEIGHT // 2
-    player = Player(center_x, center_y, shots)
+    player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, shots)
     asteroid_field = AsteroidField()
     powerup_field = PowerUpField()
     
@@ -95,7 +93,8 @@ def main():
                         shot.kill()
                         continue
                 if shot.has_collided(asteroid):
-                    shot.kill()
+                    if not player.has_piercing_shot:
+                        shot.kill()
                     asteroid.split()
                     random.choice(asteroid_kill_sounds).play()
                     score += 100
@@ -112,8 +111,13 @@ def main():
                     player.invincible = True
                 elif powerup.effect == "DECREASED SHOT COOLDOWN":
                     player.shot_cooldown *= 0.05
+                elif powerup.effect == "PIERCING SHOT":
+                    player.has_piercing_shot = True
+                elif powerup.effect == "INCREASED MOVE SPEED":
+                    player.max_speed *= 2.0
+                    player.acceleration *= 2.0
                 powerup.kill()
-                    
+                
         screen.blit(background, [0, 0])
         score_text = font.render(f"Score: {score}", True, (255, 255, 255))
         screen.blit(score_text, (16, 16))

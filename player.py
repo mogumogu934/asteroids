@@ -17,6 +17,11 @@ class Player(CircleShape):
         self.powerup_timer = 0
         self.active_powerup = None
         self.base_shot_cooldown = PLAYER_SHOT_COOLDOWN
+        self.has_piercing_shot = False
+        self.base_max_speed = PLAYER_MAX_SPEED
+        self.base_acceleration = PLAYER_ACCELERATION
+        self.max_speed = self.base_max_speed
+        self.acceleration = self.base_acceleration
         
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -36,9 +41,9 @@ class Player(CircleShape):
     def move(self, dt, forward=True):
         forward_vector = pygame.Vector2(0, 1).rotate(self.rotation)
         if forward:
-            self.velocity += forward_vector * PLAYER_ACCELERATION * dt
+            self.velocity += forward_vector * self.acceleration * dt
         else:
-            self.velocity -= forward_vector * PLAYER_ACCELERATION * dt
+            self.velocity -= forward_vector * self.acceleration * dt
         
     def rotate(self, dt, direction):
         self.rotation += PLAYER_TURN_SPEED * dt * direction
@@ -48,7 +53,7 @@ class Player(CircleShape):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w] or keys[pygame.K_UP]:
-            self.move(dt,forward=True)
+            self.move(dt, forward=True)
             
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.move(dt, forward=False)
@@ -66,8 +71,8 @@ class Player(CircleShape):
         self.velocity *= PLAYER_FRICTION
         if self.velocity.length() < 0.1:
             self.velocity = pygame.Vector2(0,0)
-        if self.velocity.length() > PLAYER_MAX_SPEED:
-            self.velocity = self.velocity.normalize() * PLAYER_MAX_SPEED
+        if self.velocity.length() > self.max_speed:
+            self.velocity = self.velocity.normalize() * self.max_speed
         if WRAP_AROUND:
             self.wrap_around(SCREEN_WIDTH, SCREEN_HEIGHT)
             
@@ -78,9 +83,14 @@ class Player(CircleShape):
                     self.invincible = False
                 elif self.active_powerup == "DECREASED SHOT COOLDOWN":
                     self.shot_cooldown = self.base_shot_cooldown
+                elif self.active_powerup == "PIERCING SHOT":
+                    self.has_piercing_shot = False
+                elif self.active_powerup == "INCREASED MOVE SPEED":
+                    self.max_speed = self.base_max_speed
+                    self.acceleration = self.base_acceleration
                 self.active_powerup = None
                 self.powerup_timer = 0
-        
+                
     def shoot(self):
         if self.shot_cooldown > 0:
             return

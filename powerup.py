@@ -32,12 +32,24 @@ class DecreasedShotCooldown(PowerUp):
         self.color = (196, 44, 44)
         self.effect = "DECREASED SHOT COOLDOWN"
         super().__init__(x, y)
+        
+class PiercingShot(PowerUp):
+    def __init__(self, x, y):
+        self.color = (116, 199, 51)
+        self.effect = "PIERCING SHOT"
+        super().__init__(x, y)
+        
+class IncreasedMoveSpeed(PowerUp):
+    def __init__(self, x, y):
+        self.color = (216, 208, 79)
+        self.effect = "INCREASED MOVE SPEED"
+        super().__init__(x, y)
 
 class PowerUpField(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.spawn_timer = 0
-        self.powerup_types = [Shield, DecreasedShotCooldown]
+        self.powerup_types = [Shield, DecreasedShotCooldown, PiercingShot, IncreasedMoveSpeed]
     
     def update(self,dt):
         self.spawn_timer += dt
