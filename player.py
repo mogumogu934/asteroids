@@ -11,6 +11,7 @@ class Player(CircleShape):
         self.shots = shots
         self.shot_cooldown = 0
         self.shot_sound = pygame.mixer.Sound("./sounds/shot01.wav")
+        self.is_charging_shot = False
         self.lives = 1
         self.invincible = False
         self.powerup_timer = 0

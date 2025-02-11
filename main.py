@@ -1,11 +1,12 @@
 import pygame # type: ignore
 import random
-from constants import *
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WRAP_AROUND
 from circleshape import CircleShape
 from player import Player
-from asteroidfield import *
+from asteroidfield import AsteroidField
+from asteroid import Asteroid
 from shot import Shot
-from powerup import *
+from powerup import PowerUpField, PowerUp
 from high_score import get_high_score, save_high_score
 
 def main():
@@ -39,9 +40,10 @@ def main():
     PowerUp.containers = (updatable, drawable, powerups,)
     PowerUpField.containers = (updatable,)
     
-    x = SCREEN_WIDTH / 2
-    y = SCREEN_HEIGHT / 2
-    player = Player(x, y, shots)
+    # Spawn player and other entities
+    center_x = SCREEN_WIDTH // 2
+    center_y = SCREEN_HEIGHT // 2
+    player = Player(center_x, center_y, shots)
     asteroid_field = AsteroidField()
     powerup_field = PowerUpField()
     
